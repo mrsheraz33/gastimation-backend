@@ -51,29 +51,9 @@ async function getCarData(year, make, model) {
   // Check if we have valid data
   if (fuelData && fuelData.length > 0) {
     const value = parseFloat(fuelData[0]);
-    if (!isNaN(value)) {
-      // If value > 10, it's likely kWh/100 km (electric vehicle)
-      if (value > 10) {
-        console.log(`⚡ Electric vehicle detected: ${year} ${make} ${model} → 0 L/100km`);
-        return [0];
-      }
-      // Petrol vehicle with normal consumption
-      console.log(`⛽ Petrol vehicle: ${year} ${make} ${model} → ${value} L/100km`);
-      return [value];
-    }
-  }
-  
-  // Fallback: Try Le/100 km (litres equivalent for EVs)
-  fuelData = await carCollection.distinct("Combined (Le/100 km)", {
-    year: year,
-    make: make,
-    model: model,
-  });
-  
-  if (fuelData && fuelData.length > 0) {
-    const value = parseFloat(fuelData[0]);
-    if (!isNaN(value)) {
-      console.log(`⚡ EV equivalent consumption: ${year} ${make} ${model} → ${value} L/100km (equivalent)`);
+    if (!isNaN(value) && value > 0) {
+      // Return the actual value from database
+      console.log(`⛽ ${year} ${make} ${model} → ${value} L/100km`);
       return [value];
     }
   }

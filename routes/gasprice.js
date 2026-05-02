@@ -54,9 +54,18 @@ router.get("/price", async (req, res) => {
       if (foundPrice) break;
     }
 
-    const price = foundPrice && !isNaN(foundPrice) ? foundPrice : 1.55;
+    const price = foundPrice && !isNaN(foundPrice) ? foundPrice : null;
 
-    // 👇 Store in cache with city key
+    if (!price) {
+      console.log(`⚠️ No price found for ${city}`);
+      return res.json({
+        success: false,
+        message: `No gas price found for ${city}`,
+        city: city,
+      });
+    }
+
+    // Store in cache with city key
     cityCache.set(cityKey, {
       price: price,
       timestamp: Date.now(),
@@ -75,12 +84,13 @@ router.get("/price", async (req, res) => {
 
   } catch (error) {
     console.log("❌ API failed:", error.message);
-    res.json({
-      success: true,
-      price: 1.55,
-      currency: "CAD",
-      unit: "liter",
-      source: "fallback",
+    
+    // ✅ No fallback — send error status
+    res.status(503).json({
+      success: false,
+      error: "Gas price API unavailable",
+      message: error.message,
+      source: "error"
     });
   }
 });
