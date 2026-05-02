@@ -7,7 +7,12 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-  origin: "https://gastimation.vercel.app"
+  origin: [
+    "https://gastimation.vercel.app",
+    "http://localhost:5173",
+    "https://gastimation.vercel.app"
+  ],
+  credentials: true
 }));
 
 
